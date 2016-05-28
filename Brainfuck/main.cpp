@@ -6,11 +6,13 @@
 #include <fstream>
 #include <sstream>
 
+//change to 1 for Windows, 0 for Unix
 #define WINDOWS 1
-#define UNIX 0
+
 #define initialSize 30000
 
 typedef std::vector <char> MemoryBank;
+char* highestMemoryCellUsed = nullptr;
 
 void Run(std::string);
 
@@ -29,9 +31,9 @@ void HoldWindow()
 void DumpMemory(MemoryBank &memory)
 {
 	int index = 0;
-	while (index < (int)memory.size())
+	while (index < (int)memory.size() && &memory[index] <= highestMemoryCellUsed)
 	{
-		printf("(%d:%s)\t", index, memory[index]);
+		printf("(%d:%c)\t", index, memory[index]);
 		index++;
 	}
 }
@@ -66,6 +68,7 @@ void Run(std::string code)
 	MemoryBank memory(initialSize, 0);
 	int counter = 0;//program counter
 	char* data = &memory[0];//pointer to where in memory we are
+	highestMemoryCellUsed = data;
 	while (counter <= (int)code.size())
 	{
 		char c = code[counter];
@@ -75,6 +78,8 @@ void Run(std::string code)
 			data++;
 			if (data == &memory[memory.size() - 1])
 				memory.resize(memory.size() + initialSize, 0);
+			if (data > highestMemoryCellUsed)
+				highestMemoryCellUsed = data;
 			break;
 		case '<':
 			if (data == &memory[0])
@@ -152,9 +157,9 @@ int main(int argc, char** argv)
 	if (argc == 1) //no options, stdin
 	{
 		std::cout << "Enter your brainfuck code, and enter EOF ";
-#ifdef WINDOWS
+#if WINDOWS
 		std::cout << "(Ctrl + Z)";
-#elif UNIX
+#else
 		std::cout << "(Ctrl + D)";
 #endif
 		std::cout << ":\n";
