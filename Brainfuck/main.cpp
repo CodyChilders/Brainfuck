@@ -38,12 +38,12 @@ void PrintUsage()
 int main(int argc, char** argv)
 {
 	
-	if (argc == 1) //no options, stdin
+	if (argc == 1) //no options, print usage
 	{
 		PrintUsage();
 		exit(0);
 	}
-	else //parse args as filenames
+	else //parse check for flag, run arg as filename
 	{
 		int filenamePos = 1;
 		bool dumpCompiledBrainfuck = false;
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 		{
 			std::stringstream buffer;
 			buffer << file.rdbuf();
-			std::cout << "Output for " << filename << ":\n";
+			std::cout << "Now running " << filename << ":\n";
 			if (EndsWith(filename, ".b") || EndsWith(filename, ".bf"))
 			{
 				Run(buffer.str());
@@ -84,6 +84,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "Unrecognized file format: " + filename << std::endl;
 				std::cout << "Expecting filenames that end in .b, .bf, or .mb" << std::endl;
+				file.close();
 				exit(1);
 			}
 		}
