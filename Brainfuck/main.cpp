@@ -9,7 +9,7 @@
 //cut off the .mb extension, append .bf, return
 std::string Rename(std::string name)
 {
-	name = name.substr(name.length() - 3);
+	name = name.substr(0, name.length() - 3);
 	name += ".bf";
 	return name;
 }
@@ -36,8 +36,7 @@ void PrintUsage()
 }
 
 int main(int argc, char** argv)
-{
-	
+{	
 	if (argc == 1) //no options, print usage
 	{
 		PrintUsage();
