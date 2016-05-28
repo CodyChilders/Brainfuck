@@ -27,13 +27,31 @@ void HoldWindow()
 	Run(",");
 }
 
+bool IsPrintable(char c)
+{
+	if (c >= 32 && c <= 126)
+		return true;
+	else
+		return false;
+}
+
 //dumps the contents of memory to stdout
 void DumpMemory(MemoryBank &memory)
 {
 	int index = 0;
+	int numPrintedThisLine = 0;
 	while (index < (int)memory.size() && &memory[index] <= highestMemoryCellUsed)
 	{
-		printf("(%d:%c)\t", index, memory[index]);
+		if (IsPrintable(memory[index]))
+			printf("(%d:%c)\t", index, memory[index]);
+		else
+			printf("(%d:%d)\t", index, memory[index]);
+		numPrintedThisLine++;
+		if (numPrintedThisLine == 10)
+		{
+			numPrintedThisLine = 0;
+			printf("\n");
+		}
 		index++;
 	}
 }
