@@ -64,7 +64,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Brainfuck.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MindBlown.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Brainfuck.h" />
+    <ClInclude Include="MindBlown.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
