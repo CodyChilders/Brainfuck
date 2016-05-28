@@ -78,7 +78,7 @@ Token::Token(char value, TokenType type)
 
 void Crash(std::string message)
 {
-	std::cout << message << std::endl;
+	std::cout << "Error: " << message << std::endl; 
 	exit(1);
 }
 
@@ -264,19 +264,79 @@ std::string Translate(std::vector<Token> tokens)
 		case TokenType::Keyword:
 			if (t.value.compare("right") == 0)
 			{
-				translatedCode += ">";
+				int numToAdd = 1;
+				if (tokens[i + 1].type == TokenType::Constant)
+				{
+					numToAdd = atoi(tokens[++i].value.c_str());
+				}
+				else if (tokens[i + 1].value.compare(";") == 0)
+				{
+					//this is valid, but nothing needs to be done.  pull it off the queue and keep going
+				}
+				else
+				{
+					//no other characters are expected here
+					Crash("Unexpected token: (" + tokens[i + 1].value + ") after 'right'.");
+				}
+				for (int i = 0; i < numToAdd; i++)
+					translatedCode += ">";
 			}
 			else if (t.value.compare("left") == 0)
 			{
-				translatedCode += "<";
+				int numToAdd = 1;
+				if (tokens[i + 1].type == TokenType::Constant)
+				{
+					numToAdd = atoi(tokens[++i].value.c_str());
+				}
+				else if (tokens[i + 1].value.compare(";") == 0)
+				{
+					//this is valid, but nothing needs to be done.  pull it off the queue and keep going
+				}
+				else
+				{
+					//no other characters are expected here
+					Crash("Unexpected token: (" + tokens[i + 1].value + ") after 'left'.");
+				}
+				for (int i = 0; i < numToAdd; i++)
+					translatedCode += "<";
 			}
 			else if (t.value.compare("up") == 0)
 			{
-				translatedCode += "+";
+				int numToAdd = 1;
+				if (tokens[i + 1].type == TokenType::Constant)
+				{
+					numToAdd = atoi(tokens[++i].value.c_str());
+				}
+				else if (tokens[i + 1].value.compare(";") == 0)
+				{
+					//this is valid, but nothing needs to be done.  pull it off the queue and keep going
+				}
+				else
+				{
+					//no other characters are expected here
+					Crash("Unexpected token: (" + tokens[i + 1].value + ") after 'up'.");
+				}
+				for (int i = 0; i < numToAdd; i++)
+					translatedCode += "+";
 			}
 			else if (t.value.compare("down") == 0)
 			{
-				translatedCode += "-";
+				int numToAdd = 1;
+				if (tokens[i + 1].type == TokenType::Constant)
+				{
+					numToAdd = atoi(tokens[++i].value.c_str());
+				}
+				else if (tokens[i + 1].value.compare(";") == 0)
+				{
+					//this is valid, but nothing needs to be done.  pull it off the queue and keep going
+				}
+				else
+				{
+					//no other characters are expected here
+					Crash("Unexpected token: (" + tokens[i + 1].value + ") after 'down'.");
+				}
+				for (int i = 0; i < numToAdd; i++)
+					translatedCode += "-";
 			}
 			else if (t.value.compare("in") == 0)
 			{
@@ -309,7 +369,8 @@ std::string Translate(std::vector<Token> tokens)
 		case TokenType::Formatting:
 			//just throw this away
 			break;
-		case TokenType::Constant:
+		case TokenType::Constant: 
+			//constants aren't inherently an error, but only follow a keyword, so it is the keyword's responsibility to process it
 			Crash("Error: unexpected token: " + t.value);
 			break;
 		case TokenType::Definition:
@@ -332,11 +393,6 @@ std::string Compile(std::string mindblowCode)
 	return brainfuckCode;
 }
 
-void HoldWindow()
-{
-	Run(",");
-}
-
 bool IsPrintable(char c)
 {
 	if (c >= 32 && c <= 126)
@@ -350,12 +406,13 @@ void DumpMemory(MemoryBank &memory)
 {
 	int index = 0;
 	int numPrintedThisLine = 0;
+	printf("\n");
 	while (index < (int)memory.size() && &memory[index] <= highestMemoryCellUsed)
 	{
 		if (IsPrintable(memory[index]))
-			printf("(%d:%c)\t", index, memory[index]);
+			printf("(%3d:%3c) ", index, memory[index]);
 		else
-			printf("(%d:%d)\t", index, memory[index]);
+			printf("(%3d:%3d) ", index, ((unsigned char)(memory[index])));
 		numPrintedThisLine++;
 		if (numPrintedThisLine == 10)
 		{
@@ -364,6 +421,7 @@ void DumpMemory(MemoryBank &memory)
 		}
 		index++;
 	}
+	printf("\n");
 }
 
 //remove all non-brainfuck chars
@@ -435,7 +493,7 @@ void Run(std::string code)
 				{
 					counter++;
 					if (counter == (int)memory.size())
-						Crash("Mismatched [ and ] characters");
+						Crash("Mismatched [ and ] characters.  Too many [ without enough ] to match.");
 					if (code[counter] == '[')
 					{
 						bracketMatcher++;
@@ -457,7 +515,7 @@ void Run(std::string code)
 				{
 					counter--;
 					if (counter < 0)
-						Crash("Mismatched [ and ] characters");
+						Crash("Mismatched [ and ] characters.  Too many ] without enough [ to match.");
 					if (code[counter] == ']')
 					{
 						bracketMatcher++;
@@ -473,6 +531,7 @@ void Run(std::string code)
 			break;
 		case '~'://not in the brainfuck spec, but helpful for me
 			DumpMemory(memory);
+			break;
 		default:
 			//ignore all other characters.
 			break;
@@ -502,6 +561,7 @@ int main(int argc, char** argv)
 		std::cin.ignore(0x7fffffff); //flush the EOF left in the stream from entry
 		//Run(allCode);
 		Run(Compile(allCode));
+		int breakhere = 0;	
 	}
 	/*
 	else //parse args as filenames
@@ -526,7 +586,4 @@ int main(int argc, char** argv)
 		}
 	}
 	*/
-#if _DEBUG
-	HoldWindow();
-#endif
 }
