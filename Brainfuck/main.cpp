@@ -8,13 +8,166 @@
 
 //change to 1 for Windows, 0 for Unix
 #define WINDOWS 1
-
 #define initialSize 30000
 
 typedef std::vector <char> MemoryBank;
 char* highestMemoryCellUsed = nullptr;
 
 void Run(std::string);
+
+static const std::string MindBlowKeywords[] =
+{
+	"right",
+	"left",
+	"up",
+	"down",
+	"out",
+	"in",
+	"loop",
+	"end",
+	"define",
+	"memdump",
+};
+
+typedef enum TokenType
+{
+	Unknown,
+	Keyword,
+	Operator,
+	RawBrainfuck,
+	Formatting,
+	Constant
+};
+
+struct Token
+{
+	std::string value;
+	TokenType type;
+
+	Token(std::string value);
+	Token(std::string value, TokenType type);
+	Token(char value);
+	Token(char value, TokenType type);
+};
+
+Token::Token(std::string value)
+{
+	this->value = value;
+	type = TokenType::Unknown;
+}
+
+Token::Token(std::string value, TokenType type)
+{
+	this->value = value;
+	this->type = type;
+}
+
+Token::Token(char value)
+{
+	this->value = "";
+	this->value += value;
+	this->type = TokenType::Unknown;
+}
+
+Token::Token(char value, TokenType type)
+{
+	this->value = "";
+	this->value += value;
+	this->type = type;
+}
+
+bool IsInt(std::string val)
+{
+	for (char c : val)
+	{
+		if (c >= '0' && c <= '9')
+		{
+			continue;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+std::vector<Token> Tokenize(std::string code)
+{
+	std::vector<Token> tokens;
+	std::string longerToken = "";
+	for (char c : code)
+	{
+		switch (c)
+		{
+		//throw away whitespace
+		case ' ':
+		case '\t':
+		case '\n':
+		case '\r\n':
+			if (longerToken.compare("") != 0)
+			{
+				tokens.push_back(Token(longerToken));
+				longerToken = "";
+			}
+			break;
+		//brainfuck
+		case '<':
+		case '>':
+		case '+':
+		case '-':
+		case '.':
+		case ',':
+		case '[':
+		case ']':
+		case '~':
+			if (longerToken.compare("") != 0)
+			{
+				tokens.push_back(Token(longerToken));
+				longerToken = "";
+			}
+			tokens.push_back(Token(c, TokenType::RawBrainfuck));
+			break;
+		//formatting
+		case '(':
+		case ')':
+		case '{':
+		case '}':
+		case ';':
+			if (longerToken.compare("") != 0)
+			{
+				tokens.push_back(Token(longerToken));
+				longerToken = "";
+			}
+			tokens.push_back(Token(c, TokenType::Formatting));
+			break;
+		//all other chars
+		default:
+			longerToken += c;
+			break;
+		}
+	}
+	return tokens;
+}
+
+std::vector<Token> Classify(std::vector<Token> &tokens)
+{
+	std::vector<Token> x;
+	return x;
+}
+
+std::string Translate(std::vector<Token> tokens)
+{
+	return "";
+}
+
+std::string Compile(std::string mindblowCode)
+{
+	std::vector<Token> tokens = Tokenize(mindblowCode);
+	std::vector<Token> organizedTokens = Classify(tokens);
+	std::string brainfuckCode = Translate(organizedTokens);
+	return brainfuckCode;
+}
 
 void Crash(std::string message)
 {
@@ -80,6 +233,7 @@ std::string CleanCode(std::string code)
 	return cleanCode;
 }
 
+//This function runs the brainfuck code as is, stripping all non-brainfuck chars from input.
 void Run(std::string code)
 {
 	code = CleanCode(code);
@@ -172,6 +326,7 @@ void Run(std::string code)
 
 int main(int argc, char** argv)
 {
+	
 	if (argc == 1) //no options, stdin
 	{
 		std::cout << "Enter your brainfuck code, and enter EOF ";
@@ -187,9 +342,11 @@ int main(int argc, char** argv)
 		{
 			allCode += line;
 		}
-		std::cin.ignore(0x7fffffff);
-		Run(allCode);
+		std::cin.ignore(0x7fffffff); //flush the EOF left in the stream from entry
+		//Run(allCode);
+		Compile(allCode);
 	}
+	/*
 	else //parse args as filenames
 	{
 		for (int i = 1; i < argc; i++)
@@ -211,6 +368,7 @@ int main(int argc, char** argv)
 			file.close();
 		}
 	}
+	*/
 #if _DEBUG
 	HoldWindow();
 #endif
