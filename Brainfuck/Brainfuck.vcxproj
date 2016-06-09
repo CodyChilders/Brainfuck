@@ -65,12 +65,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Brainfuck.cpp" />
+    <ClCompile Include="Macro.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MindBlown.cpp" />
+    <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Brainfuck.h" />
+    <ClInclude Include="Macro.h" />
     <ClInclude Include="MindBlown.h" />
+    <ClInclude Include="Token.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

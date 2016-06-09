@@ -14,7 +14,8 @@ std::string Rename(std::string name)
 	return name;
 }
 
-bool EndsWith(std::string const &fullString, std::string const &ending) {
+bool EndsWith(std::string const &fullString, std::string const &ending) 
+{
 	if (fullString.length() >= ending.length()) 
 	{
 		return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
@@ -34,6 +35,30 @@ void PrintUsage()
 	std::cout << "-b means nothing if the original source was brainfuck." << std::endl;
 	std::cout << "For documentation, please view readme at https://github.com/CodyIsAwesome/Brainfuck" << std::endl;
 }
+//adfbjcl
+std::string GetOpt(int argc, char** argv)
+{
+	//scans argv for any arguments starting with '-'
+	//assemble letters that follow into one string, and return that
+	//super string for the caller to scan more easily
+
+	//start at 1 to skip the filename in argv[0]
+	std::string suppliedOptions = "";
+	for (int i = 1; i < argc; i++)
+	{
+		std::string thisArg = argv[i];
+		if (thisArg[0] != '-')
+		{
+			continue;
+		}
+		//start at 1 to skip the '-'
+		for (int j = 1; j < thisArg.length(); j++)
+		{
+			suppliedOptions += thisArg[j];
+		}
+	}
+	return suppliedOptions;
+}
 
 int main(int argc, char** argv)
 {	
@@ -44,9 +69,11 @@ int main(int argc, char** argv)
 	}
 	else //parse check for flag, run arg as filename
 	{
+		std::string options = GetOpt(argc, argv);
 		int filenamePos = 1;
 		bool dumpCompiledBrainfuck = false;
-		if (std::string(argv[1]).compare("-b") == 0)
+		int bPos = options.find("b");
+		if (bPos != std::string::npos)
 		{
 			filenamePos = 2;
 			dumpCompiledBrainfuck = true;
