@@ -70,6 +70,10 @@ int main(int argc, char** argv)
 	else //parse check for flag, run arg as filename
 	{
 		std::string options = GetOpt(argc, argv);
+		if (options.size() > 1)
+		{
+			Crash("Unknown options were given.  Only the -b option is supported.");
+		}
 		int filenamePos = 1;
 		bool dumpCompiledBrainfuck = false;
 		int bPos = options.find("b");
